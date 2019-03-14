@@ -1,0 +1,10 @@
+spring:
+  datasource:
+   driver-class-name: "com.mysql.jdbc.Driver"
+   url: "jdbc:mysql://192.168.64.128:3306/test?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull"
+   username: canal
+   password: canal
+mybatis:
+ base-package: "com.example.kafka.demo.dao"
+ camel2underline: true
+ mapper-locations: "classpath:mapper/*.xml"
