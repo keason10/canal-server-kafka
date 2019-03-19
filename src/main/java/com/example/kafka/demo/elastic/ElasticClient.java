@@ -1,5 +1,6 @@
 package com.example.kafka.demo.elastic;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -16,8 +17,7 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.*;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.script.mustache.SearchTemplateRequest;
@@ -28,6 +28,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ElasticClient {
@@ -36,6 +37,8 @@ public class ElasticClient {
         RestClientBuilder restClientBuilder = RestClient.builder(new HttpHost("192.168.64.128", 9200, "http"));
         client = new RestHighLevelClient(restClientBuilder);
     }
+
+    private String string;
 
 
     public static IndexResponse insert(String index, String type, String docId, String dataJson) throws IOException {
@@ -51,11 +54,12 @@ public class ElasticClient {
         return getResponse;
     }
 
-    public static SearchHits searchWhere(String index, String type, String custId) throws IOException {
+    //通过单个键名称 和对应的键值查询数据
+    public static SearchHits searchWhere(String index, String type, String keyName,Object keyValue) throws IOException {
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest.types(type);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(QueryBuilders.matchQuery("cust_id", custId));
+        searchSourceBuilder.query(QueryBuilders.matchQuery(keyName, keyValue));
         searchRequest.source(searchSourceBuilder);
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         if (searchResponse.status() == RestStatus.OK) {

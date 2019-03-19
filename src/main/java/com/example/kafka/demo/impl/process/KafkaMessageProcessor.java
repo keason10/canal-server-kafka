@@ -55,7 +55,7 @@ public class KafkaMessageProcessor {
                 else if ("INSERT".equals(message.getType()) && "test.customer".equals(message.getDatabase() + "." + message.getTable())) {
                     //not need to process
                 } else if ("UPDATE".equals(message.getType()) && "test.customer".equals(message.getDatabase() + "." + message.getTable())) {
-                    SearchHits hits = ElasticClient.searchWhere(message.getDatabase(),"order", map.get("id"));
+                    SearchHits hits = ElasticClient.searchWhere(message.getDatabase(),"order", "cust_id",map.get("id"));
                     if (hits == null) {
                         return;
                     }
@@ -68,7 +68,7 @@ public class KafkaMessageProcessor {
                     }
 
                 } else if ("DELETE".equals(message.getType()) && "test.customer".equals(message.getDatabase() + "." + message.getTable())){
-                    SearchHits hits = ElasticClient.searchWhere(message.getDatabase(), "order", map.get("id"));
+                    SearchHits hits = ElasticClient.searchWhere(message.getDatabase(), "order", "cust_id", map.get("id"));
                     if (hits == null) {
                         return;
                     }
