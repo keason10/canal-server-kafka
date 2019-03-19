@@ -132,7 +132,7 @@ public class ElasticClient {
         //设置变量值
         request.setScriptParams(param);
         SearchTemplateResponse response = client.searchTemplate(request, RequestOptions.DEFAULT);
-        //返回值字段参考
+        //返回值字段参考 response.json
         return response;
     }
 
