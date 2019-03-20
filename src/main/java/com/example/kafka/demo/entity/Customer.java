@@ -13,7 +13,7 @@ public class Customer {
     private Integer id;
     private String name;
     private Integer sex;
-    private String mobike;
+    private String mobile;
     private String location;
 
     public Integer getId() {
@@ -40,12 +40,12 @@ public class Customer {
         this.sex = sex;
     }
 
-    public String getMobike() {
-        return mobike;
+    public String getMobile() {
+        return mobile;
     }
 
-    public void setMobike(String mobike) {
-        this.mobike = mobike;
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     public String getLocation() {

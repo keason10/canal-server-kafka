@@ -93,7 +93,7 @@ public class KafkaMessageProcessor {
         if (customers == null || customers.size() == 0) {
             return;
         }
-        map.put("mobile", customers.get(0).getMobike());
+        map.put("mobile", customers.get(0).getMobile());
         map.put("sex", customers.get(0).getSex() == 1 ? "男" : "女");
         map.put("location", customers.get(0).getLocation());
     }
