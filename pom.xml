@@ -16,6 +16,7 @@
 
         <properties>
             <java.version>1.8</java.version>
+            <elasticsearch.version>6.6.2</elasticsearch.version>
         </properties>
 
         <dependencies>
@@ -63,50 +64,11 @@
                 <artifactId>spring-boot-starter-test</artifactId>
                 <scope>test</scope>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch -->
-            <dependency>
-                <groupId>org.elasticsearch</groupId>
-                <artifactId>elasticsearch</artifactId>
-                <version>6.6.2</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-client -->
-            <dependency>
-                <groupId>org.elasticsearch.client</groupId>
-                <artifactId>elasticsearch-rest-client</artifactId>
-                <version>6.6.2</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.elasticsearch.plugin/parent-join-client -->
-            <dependency>
-                <groupId>org.elasticsearch.plugin</groupId>
-                <artifactId>parent-join-client</artifactId>
-                <version>6.6.2</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.elasticsearch.plugin/aggs-matrix-stats-client -->
-            <dependency>
-                <groupId>org.elasticsearch.plugin</groupId>
-                <artifactId>aggs-matrix-stats-client</artifactId>
-                <version>6.6.2</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.elasticsearch.plugin/rank-eval-client -->
-            <dependency>
-                <groupId>org.elasticsearch.plugin</groupId>
-                <artifactId>rank-eval-client</artifactId>
-                <version>6.6.2</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.elasticsearch.plugin/lang-mustache-client -->
-            <dependency>
-                <groupId>org.elasticsearch.plugin</groupId>
-                <artifactId>lang-mustache-client</artifactId>
-                <version>6.6.2</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.elasticsearch.client</groupId>
                 <artifactId>elasticsearch-rest-high-level-client</artifactId>
-                <version>6.6.2</version>
             </dependency>
         </dependencies>
-
         <build>
             <plugins>
                 <plugin>
