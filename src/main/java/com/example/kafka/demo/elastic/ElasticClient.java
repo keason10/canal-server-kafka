@@ -1,6 +1,7 @@
 package com.example.kafka.demo.elastic;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -31,10 +32,7 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 //官方文档 https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high.html
 public class ElasticClient {
@@ -45,6 +43,15 @@ public class ElasticClient {
         client = new RestHighLevelClient(restClientBuilder);
     }
 
+    /**
+     * 插入数据
+     * @param index         database            必填
+     * @param type          table               必填
+     * @param docId         主键                必填
+     * @param dataJson      插入的数据JSON      必填
+     * @return
+     * @throws IOException
+     */
     public static IndexResponse insert(String index, String type, String docId, String dataJson) throws IOException {
         IndexRequest request = new IndexRequest(index, type, docId);
         request.source(dataJson, XContentType.JSON);
@@ -52,13 +59,15 @@ public class ElasticClient {
         return response;
     }
 
-    public static GetResponse search(String index, String type, String docId, String dataJson) throws IOException {
-        GetRequest request = new GetRequest(index, type, docId).version(2);
-        GetResponse getResponse = client.get(request, RequestOptions.DEFAULT);
-        return getResponse;
-    }
-
-    //通过单个键名称 和对应的键值查询数据
+    /**
+     * 通过一个传递keyName和对应的keyValue 查询数据
+     * @param index         database    必填
+     * @param type          table       必填
+     * @param keyName       fieldName   必填
+     * @param keyValue      fieldValue  必填
+     * @return
+     * @throws IOException
+     */
     public static SearchHits searchWhere(String index, String type, String keyName,Object keyValue) throws IOException {
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest.types(type);
@@ -73,6 +82,15 @@ public class ElasticClient {
         return null;
     }
 
+    /**
+     * 根据 index type docId 更新数据
+     * @param index       database      必填
+     * @param type        table         必填
+     * @param docId       必填 更新数据的主键
+     * @param dataJson    更新的JSON数据, 没有的字段会新增，有的字段会覆盖，如果更新为空，请用空字符串
+     * @return
+     * @throws IOException
+     */
     public static UpdateResponse updateWithJson(String index, String type, String docId, String dataJson) throws IOException {
         UpdateRequest request = new UpdateRequest(index, type, docId);
         request.doc(dataJson, XContentType.JSON);
@@ -80,25 +98,31 @@ public class ElasticClient {
         return response;
     }
 
-    public static UpdateResponse updateWithBuilder(String index, String type, String docId, XContentBuilder builder) throws IOException {
-        UpdateRequest request = new UpdateRequest(index, type, docId);
-        request.doc(builder);
-        UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
-        return response;
-    }
 
-
-
+    /**
+     * 根据 index type  docId 删除记录
+     * @param index     database    必填
+     * @param type      table       必填
+     * @param docId     删除的主键   必填
+     * @return          DeleteResponse
+     * @throws IOException
+     */
     public static DeleteResponse delete(String index, String type, String docId) throws IOException {
         DeleteRequest request = new DeleteRequest(index, type, docId);
         DeleteResponse response = client.delete(request, RequestOptions.DEFAULT);
         return response;
     }
 
-    //param 不支支持嵌套对象
-    //根据param 中的 key1=value1 and key2= value2 。。。组装之后 查询 index/type 返回数据
+    /**
+     * 根据param 中的 key1=value1 and key2= value2 。。。组装之后 查询 index/type 返回数据
+     * @param index     database    必填
+     * @param type      table       必填
+     * @param param     查询的参数   必填    map的key对应Es中的字段名，map 的value 为对应字段值 
+     * @return          SearchTemplateResponse
+     * @throws IOException
+     */
     public static SearchTemplateResponse mutiAndSearch(String index, String type,Map<String,Object> param) throws IOException {
-        if (param == null) {
+        if (StringUtils.isEmpty(index) || StringUtils.isEmpty(type) || param == null || param.isEmpty()) {
             return null;
         }
         SearchTemplateRequest request = new SearchTemplateRequest();
@@ -131,8 +155,21 @@ public class ElasticClient {
         return response;
     }
 
-    //根据 keyName = ${keyValue} 查询 index/type 找到对应记录，用param 参数进行更新
+    /**
+     *  根据keyName = ${keyValue} 查询 index/type 找到对应记录，用param 参数进行更新
+     * @param index     database    必填
+     * @param type      table       必填
+     * @param keyName   fieldName   必填
+     * @param keyValue  fieldValue  必填
+     * @param param     要更新的数据 必填   map的key对应Es中的字段名，map 的value 为对应字段值
+     * @return          BulkByScrollResponse
+     * @throws IOException
+     */
     public static BulkByScrollResponse updateKeyWithDoc(String index,String type,String keyName,Object keyValue,Map<String,Object> param) throws IOException {
+        if (StringUtils.isEmpty(index) || StringUtils.isEmpty(type) || StringUtils.isEmpty(keyName)
+                || keyValue == null ||param ==null || param.isEmpty()) {
+            return null;
+        }
         UpdateByQueryRequest request = new UpdateByQueryRequest(index);
         request.setDocTypes(type);
         request.setQuery(QueryBuilders.matchQuery(keyName, keyValue));
