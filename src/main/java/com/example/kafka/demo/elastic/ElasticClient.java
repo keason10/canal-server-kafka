@@ -3,6 +3,8 @@ package com.example.kafka.demo.elastic;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -36,13 +38,7 @@ import java.util.Map;
 
 //官方文档 https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high.html
 public class ElasticClient {
-    private static RestHighLevelClient client;
-    private TransportClient tclient;
-    static  {
-        RestClientBuilder restClientBuilder = RestClient.builder(new HttpHost("192.168.64.128", 9200, "http"));
-        client = new RestHighLevelClient(restClientBuilder);
-    }
-
+    private static RestHighLevelClient client = ESClientFactory.getHighLevelClient();
     /**
      * 插入数据
      * @param index         database            必填
