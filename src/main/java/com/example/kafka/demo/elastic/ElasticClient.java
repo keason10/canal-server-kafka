@@ -2,9 +2,6 @@ package com.example.kafka.demo.elastic;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpHost;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -14,10 +11,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
@@ -28,6 +22,9 @@ import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.script.mustache.SearchTemplateRequest;
 import org.elasticsearch.script.mustache.SearchTemplateResponse;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.io.IOException;
@@ -182,14 +179,35 @@ public class ElasticClient {
 
 
     public static void main(String[] args) throws IOException {
-        Map<String, Object> map = new HashMap<>();
-        map.put("mobile", "111111111111");
-        map.put("note", "1111111");
-        map.put("location", "what a fuck method");
-        updateKeyWithDoc("test", "order", "cust_id", "1", map);
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("mobile", "111111111111");
+//        map.put("note", "1111111");
+//        map.put("location", "what a fuck method");
+//        updateKeyWithDoc("test", "order", "cust_id", "1", map);
+//
+//
+//        mutiAndSearch("test", "order", map);
 
+        testAggregation();
+    }
 
-        mutiAndSearch("test", "order", map);
+    public static void testAggregation() throws IOException {
+        SearchRequest searchRequest = new SearchRequest();
+        searchRequest.indices("test").types("order");
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+        //设置聚合操作
+        TermsAggregationBuilder termsAggregationBuilder = AggregationBuilders.terms("by_sex").field("sex");
+        termsAggregationBuilder.subAggregation(AggregationBuilders.count("sex_cnt").field("sex")).
+                subAggregation(AggregationBuilders.terms("by_id").field("id").subAggregation(AggregationBuilders.count("cnt_id").field("id")));
+        searchSourceBuilder.aggregation(termsAggregationBuilder);
+
+        //设置过滤条件
+        searchSourceBuilder.query(QueryBuilders.termsQuery("id", "1", "2"));
+
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse searchResponse = ESClientFactory.getHighLevelClient().search(searchRequest, RequestOptions.DEFAULT);
+        Aggregations aggregations = searchResponse.getAggregations();
     }
 
 }
